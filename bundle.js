@@ -63,7 +63,38 @@
 	    }
 	};
 
-	var createStore = redux.createStore;
+	// const {createStore} = redux;
+	var createStore = function createStore(reducer) {
+	    var state = void 0;
+	    var listeners = [];
+
+	    var getState = function getState() {
+	        return state;
+	    };
+
+	    var dispatch = function dispatch(action) {
+	        state = reducer(state, action);
+	        listeners.forEach(function (listener) {
+	            return listener();
+	        });
+	    };
+
+	    var subscribe = function subscribe(listener) {
+	        listeners.push(listener);
+	        console.log('listeners', listeners.length);
+
+	        return function () {
+	            listeners = listeners.filter(function (l) {
+	                return l !== listener;
+	            });
+	            console.log('listeners', listeners.length);
+	        };
+	    };
+
+	    dispatch({});
+
+	    return { getState: getState, dispatch: dispatch, subscribe: subscribe };
+	};
 
 	var store = createStore(counter);
 
@@ -72,6 +103,7 @@
 	};
 
 	store.subscribe(render);
+
 	render();
 
 	document.addEventListener('click', function () {
