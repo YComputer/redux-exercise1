@@ -68,6 +68,9 @@
 	// 分割reducer
 
 	var todo = function todo(state, action) {
+	    console.log('todo reducer');
+	    console.log(state);
+
 	    switch (action.type) {
 	        case 'ADD_TODO':
 	            return { id: action.id, text: action.text, completed: false };
@@ -85,6 +88,9 @@
 	    var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
 	    var action = arguments[1];
 
+	    console.log('todos reducer');
+	    console.log(state);
+
 	    switch (action.type) {
 	        case 'ADD_TODO':
 	            return [].concat(_toConsumableArray(state), [todo(undefined, action)]);
@@ -101,6 +107,8 @@
 	    var state = arguments.length <= 0 || arguments[0] === undefined ? 'SHOW_ALL' : arguments[0];
 	    var action = arguments[1];
 
+	    console.log('visibility reducer');
+	    console.log(state);
 	    switch (action.type) {
 	        case 'SET_VISIBILITY_FILTER':
 	            return action.filter;
@@ -114,6 +122,25 @@
 	    visibilityFilter: visibilityFilter
 	});
 	var store = createStore(todoApp);
+	// compoent 的简便写法，filter和children是props。
+	var FilterLink = function FilterLink(_ref) {
+	    var filter = _ref.filter;
+	    var children = _ref.children;
+
+	    return React.createElement(
+	        'a',
+	        { href: '#',
+	            onClick: function onClick(e) {
+	                e.preventDefault();
+	                store.dispatch({
+	                    type: 'SET_VISIBILITY_FILTER',
+	                    filter: filter
+	                });
+	            }
+	        },
+	        children
+	    );
+	};
 
 	var nextTodoId = 0;
 
@@ -140,6 +167,7 @@
 	                React.createElement(
 	                    'button',
 	                    { onClick: function onClick() {
+	                            if (_this2.input.value.trim() === '') return;
 	                            store.dispatch({
 	                                type: 'ADD_TODO',
 	                                text: _this2.input.value,
@@ -155,10 +183,46 @@
 	                    this.props.todos.map(function (todo) {
 	                        return React.createElement(
 	                            'li',
-	                            { key: todo.id },
+	                            { key: todo.id,
+	                                onClick: function onClick() {
+	                                    store.dispatch({
+	                                        type: 'TOGGLE_TODO',
+	                                        id: todo.id
+	                                    });
+	                                },
+	                                style: { textDecoration: todo.completed ? 'line-through' : 'none' } },
 	                            todo.text
 	                        );
 	                    })
+	                ),
+	                React.createElement(
+	                    'p',
+	                    null,
+	                    'Show:',
+	                    ' ',
+	                    React.createElement(
+	                        FilterLink,
+	                        {
+	                            filter: 'SHOW_ALL'
+	                        },
+	                        'ALL'
+	                    ),
+	                    ' ',
+	                    React.createElement(
+	                        FilterLink,
+	                        {
+	                            filter: 'SHOW_ACTIVE'
+	                        },
+	                        'Active'
+	                    ),
+	                    ' ',
+	                    React.createElement(
+	                        FilterLink,
+	                        {
+	                            filter: 'SHOW_COMPLETED'
+	                        },
+	                        'Completed'
+	                    )
 	                )
 	            );
 	        }
@@ -168,6 +232,7 @@
 	}(Component);
 
 	var render = function render() {
+	    console.log(store.getState());
 	    ReactDOM.render(React.createElement(TodoApp, { todos: store.getState().todos }), document.getElementById('app'));
 	};
 
