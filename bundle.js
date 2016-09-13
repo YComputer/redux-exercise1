@@ -117,7 +117,7 @@
 	                type: 'DECREMENT'
 	            });
 	        }
-	    }), document.getElementById('app'));
+	    }), document.getElementById('root'));
 	};
 
 	store.subscribe(render);
