@@ -136,21 +136,21 @@
 
 	var store = (0, _redux.createStore)(todoApp);
 
-	var FilterLink = function (_React$Component) {
-	    _inherits(FilterLink, _React$Component);
+	var Link = function (_React$Component) {
+	    _inherits(Link, _React$Component);
 
-	    function FilterLink() {
-	        _classCallCheck(this, FilterLink);
+	    function Link() {
+	        _classCallCheck(this, Link);
 
-	        return _possibleConstructorReturn(this, (FilterLink.__proto__ || Object.getPrototypeOf(FilterLink)).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (Link.__proto__ || Object.getPrototypeOf(Link)).apply(this, arguments));
 	    }
 
-	    _createClass(FilterLink, [{
+	    _createClass(Link, [{
 	        key: 'render',
 	        value: function render() {
 	            var _this2 = this;
 
-	            if (this.props.filter === this.props.currentFilter) {
+	            if (this.props.active) {
 	                return _react2.default.createElement(
 	                    'span',
 	                    null,
@@ -163,9 +163,56 @@
 	                { href: '#',
 	                    onClick: function onClick(e) {
 	                        e.preventDefault();
-	                        _this2.props.onClick(_this2.props.filter);
+	                        _this2.props.onClick();
 	                    } },
 	                this.props.children
+	            );
+	        }
+	    }]);
+
+	    return Link;
+	}(_react2.default.Component);
+
+	var FilterLink = function (_React$Component2) {
+	    _inherits(FilterLink, _React$Component2);
+
+	    function FilterLink() {
+	        _classCallCheck(this, FilterLink);
+
+	        return _possibleConstructorReturn(this, (FilterLink.__proto__ || Object.getPrototypeOf(FilterLink)).apply(this, arguments));
+	    }
+
+	    _createClass(FilterLink, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var _this4 = this;
+
+	            this.unsubscribe = store.subscribe(function () {
+	                return _this4.forceUpdate();
+	            });
+	        }
+	    }, {
+	        key: 'componentWillUnmount',
+	        value: function componentWillUnmount() {
+	            this.unsubscribe();
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var props = this.props;
+	            var state = store.getState();
+	            return _react2.default.createElement(
+	                Link,
+	                {
+	                    active: props.filter === state.visibilityFilter,
+	                    onClick: function onClick() {
+	                        store.dispatch({
+	                            type: 'SET_VISIBILITY_FILTER',
+	                            filter: props.filter
+	                        });
+	                    }
+	                },
+	                props.children
 	            );
 	        }
 	    }]);
@@ -173,8 +220,8 @@
 	    return FilterLink;
 	}(_react2.default.Component);
 
-	var Footer = function (_React$Component2) {
-	    _inherits(Footer, _React$Component2);
+	var Footer = function (_React$Component3) {
+	    _inherits(Footer, _React$Component3);
 
 	    function Footer() {
 	        _classCallCheck(this, Footer);
@@ -193,27 +240,24 @@
 	                _react2.default.createElement(
 	                    FilterLink,
 	                    {
-	                        filter: 'SHOW_ALL',
-	                        currentFilter: this.props.visibilityFilter,
-	                        onClick: this.props.onFilterClick },
+	                        filter: 'SHOW_ALL'
+	                    },
 	                    'All'
 	                ),
 	                ', ',
 	                _react2.default.createElement(
 	                    FilterLink,
 	                    {
-	                        filter: 'SHOW_ACTIVE',
-	                        currentFilter: this.props.visibilityFilter,
-	                        onClick: this.props.onFilterClick },
+	                        filter: 'SHOW_ACTIVE'
+	                    },
 	                    'Active'
 	                ),
 	                ', ',
 	                _react2.default.createElement(
 	                    FilterLink,
 	                    {
-	                        filter: 'SHOW_COMPLETED',
-	                        currentFilter: this.props.visibilityFilter,
-	                        onClick: this.props.onFilterClick },
+	                        filter: 'SHOW_COMPLETED'
+	                    },
 	                    'Completed'
 	                )
 	            );
@@ -223,8 +267,8 @@
 	    return Footer;
 	}(_react2.default.Component);
 
-	var Todo = function (_React$Component3) {
-	    _inherits(Todo, _React$Component3);
+	var Todo = function (_React$Component4) {
+	    _inherits(Todo, _React$Component4);
 
 	    function Todo() {
 	        _classCallCheck(this, Todo);
@@ -250,8 +294,8 @@
 	    return Todo;
 	}(_react2.default.Component);
 
-	var TodoList = function (_React$Component4) {
-	    _inherits(TodoList, _React$Component4);
+	var TodoList = function (_React$Component5) {
+	    _inherits(TodoList, _React$Component5);
 
 	    function TodoList() {
 	        _classCallCheck(this, TodoList);
@@ -262,7 +306,7 @@
 	    _createClass(TodoList, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this6 = this;
+	            var _this8 = this;
 
 	            // const {todos} = this.props.todos;
 	            return _react2.default.createElement(
@@ -273,7 +317,7 @@
 	                        key: todo.id
 	                    }, todo, {
 	                        onClick: function onClick() {
-	                            return _this6.props.onTodoClick(todo.id);
+	                            return _this8.props.onTodoClick(todo.id);
 	                        }
 	                    }));
 	                })
@@ -284,8 +328,8 @@
 	    return TodoList;
 	}(_react2.default.Component);
 
-	var AddTodo = function (_React$Component5) {
-	    _inherits(AddTodo, _React$Component5);
+	var AddTodo = function (_React$Component6) {
+	    _inherits(AddTodo, _React$Component6);
 
 	    function AddTodo() {
 	        _classCallCheck(this, AddTodo);
@@ -296,8 +340,6 @@
 	    _createClass(AddTodo, [{
 	        key: 'render',
 	        value: function render() {
-	            var _this8 = this;
-
 	            var input = void 0;
 	            return _react2.default.createElement(
 	                'div',
@@ -308,7 +350,11 @@
 	                _react2.default.createElement(
 	                    'button',
 	                    { onClick: function onClick() {
-	                            _this8.props.onAddClick(input.value);
+	                            store.dispatch({
+	                                type: 'ADD_TODO',
+	                                text: input.value,
+	                                id: nextTodoId++
+	                            });
 	                            input.value = '';
 	                        } },
 	                    'Add Todo'
@@ -335,68 +381,62 @@
 	    }
 	};
 
-	var nextTodoId = 0;
+	var VisibleTodoList = function (_React$Component7) {
+	    _inherits(VisibleTodoList, _React$Component7);
 
-	var TodoApp = function (_React$Component6) {
-	    _inherits(TodoApp, _React$Component6);
+	    function VisibleTodoList() {
+	        _classCallCheck(this, VisibleTodoList);
 
-	    function TodoApp() {
-	        _classCallCheck(this, TodoApp);
-
-	        return _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).apply(this, arguments));
+	        return _possibleConstructorReturn(this, (VisibleTodoList.__proto__ || Object.getPrototypeOf(VisibleTodoList)).apply(this, arguments));
 	    }
 
-	    _createClass(TodoApp, [{
+	    _createClass(VisibleTodoList, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var _this11 = this;
+
+	            this.unsubscribe = store.subscribe(function () {
+	                return _this11.forceUpdate();
+	            });
+	        }
+	    }, {
+	        key: 'componentWillUnmount',
+	        value: function componentWillUnmount() {
+	            this.unsubscribe();
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _props = this.props;
-	            var todos = _props.todos;
-	            var visibilityFilter = _props.visibilityFilter;
+	            var props = this.props;
+	            var state = store.getState();
 
-	            var visibleTodos = getVisibleTodos(todos, visibilityFilter);
-	            return _react2.default.createElement(
-	                'div',
-	                null,
-	                _react2.default.createElement(AddTodo, {
-	                    onAddClick: function onAddClick(text) {
-	                        store.dispatch({
-	                            type: 'ADD_TODO',
-	                            text: text,
-	                            id: nextTodoId++
-	                        });
-	                    }
-	                }),
-	                _react2.default.createElement(TodoList, {
-	                    todos: visibleTodos,
-	                    onTodoClick: function onTodoClick(id) {
-	                        store.dispatch({
-	                            type: 'TOGGLE_TODO',
-	                            id: id
-	                        });
-	                    }
-	                }),
-	                _react2.default.createElement(Footer, {
-	                    visibilityFilter: visibilityFilter,
-	                    onFilterClick: function onFilterClick(filter) {
-	                        return store.dispatch({
-	                            type: 'SET_VISIBILITY_FILTER',
-	                            filter: filter
-	                        });
-	                    }
-	                })
-	            );
+	            return _react2.default.createElement(TodoList, {
+	                todos: getVisibleTodos(state.todos, state.visibilityFilter),
+	                onTodoClick: function onTodoClick(id) {
+	                    return store.dispatch({
+	                        type: 'TOGGLE_TODO',
+	                        id: id
+	                    });
+	                }
+	            });
 	        }
 	    }]);
 
-	    return TodoApp;
+	    return VisibleTodoList;
 	}(_react2.default.Component);
 
-	var render = function render() {
-	    _reactDom2.default.render(_react2.default.createElement(TodoApp, store.getState()), document.getElementById('root'));
+	var nextTodoId = 0;
+	var TodoApp = function TodoApp() {
+	    return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(AddTodo, null),
+	        _react2.default.createElement(VisibleTodoList, null),
+	        _react2.default.createElement(Footer, null)
+	    );
 	};
 
-	store.subscribe(render);
-	render();
+	_reactDom2.default.render(_react2.default.createElement(TodoApp, null), document.getElementById('root'));
 
 /***/ },
 /* 1 */
